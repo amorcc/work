@@ -1,0 +1,79 @@
+关于数据库数据访问的标准
+1.访问数据库统一使用 my.data.access.dll 里的 SqlHelper下面的各个方法
+2.需要对返回数据进行处理的,必须使用 using 语法,确保资源能够被及时释放
+3.所有业务逻辑数据库需要按以下格式生成
+--注释 标准 作者 时间 简单逻辑
+CREATE PROC [dbo].[proc_XXX(业务模块)_AAA(功能111)] 
+    @Para1 varchar(50),
+    @Para1 varchar(50),...
+    @sysUserID int=0 ,--这2个参数强制保留
+    @msg VARCHAR(200) OUTPUT
+AS
+    BEGIN
+        SET NOCOUNT ON; 
+        BEGIN TRY	
+          
+          --自己的业务逻辑T sql 
+        END TRY 
+        BEGIN CATCH 	
+            SET @msg = dbo.fn_sys_error(ERROR_MESSAGE());
+        END CATCH;
+	SET NOCOUNT OFF;	    
+    END;
+4.代码调用完成后,必须验证输出参数是否为空. 不空说明Tsql 异常.
+如果有其他业务逻辑需要有更多的输出参数,
+建议使用 返回一行或多行数据的方式. @msg 为 Tsql 异常保留使用.
+
+5.任何更新都以 Region TID_XXXX_开始, TID_XXXX结束 标志框起来,内容里面包括 负责人,更新日期,简单逻辑
+6.任何紧急更新都以 Region TID_紧急_年月日_开始, TID_紧急_年月日_结束 标志框起来,内容里面包括 负责人,更新日期,简单逻辑
+12:06:09
+米斯特儿李 2016/7/20 12:06:09
+
+
+关于数据库数据访问的标准
+1.访问数据库统一使用 my.data.access.dll 里的 SqlHelper下面的各个方法
+2.需要对返回数据进行处理的,必须使用 using 语法,确保资源能够被及时释放
+3.所有业务逻辑数据库需要按以下格式生成
+--注释 标准 作者 时间 简单逻辑
+CREATE PROC [dbo].[proc_XXX(业务模块)_AAA(功能111)] 
+    @Para1 varchar(50),
+    @Para1 varchar(50),...
+    @sysUserID int=0 ,--这2个参数强制保留
+    @msg VARCHAR(200) OUTPUT
+AS
+    BEGIN
+        SET NOCOUNT ON; 
+        BEGIN TRY	
+          
+          --自己的业务逻辑T sql 
+        END TRY 
+        BEGIN CATCH 	
+            SET @msg = dbo.fn_sys_error(ERROR_MESSAGE());
+        END CATCH;
+	SET NOCOUNT OFF;	    
+    END;
+4.代码调用完成后,必须验证输出参数是否为空. 不空说明Tsql 异常.
+如果有其他业务逻辑需要有更多的输出参数,
+建议使用 返回一行或多行数据的方式. @msg 为 Tsql 异常保留使用.
+
+5.任何更新都以 Region TID_XXXX_开始, TID_XXXX结束 标志框起来,内容里面包括 负责人,更新日期,简单逻辑
+6.任何紧急更新都以 Region TID_紧急_年月日_开始, TID_紧急_年月日_结束 标志框起来,内容里面包括 负责人,更新日期,简单逻辑
+7.功能函数命名, 要参考业务逻辑,做到命名见名知意. 写好函数用途注释,参数注释,返回值注释, 需附上 负责人,日期
+	/// <summary>
+        /// 这个函数是干啥的
+        /// </summary>
+        /// <param name="para1">这个参数是干啥的</param>
+        /// <returns>返回值得描述</returns> 
+        public string Fun1(string para1)//by ldf 07202016
+        {
+            #region TID_201600010 
+            //by ldf 07202016 逻辑注释
+
+            #endregion
+
+            #region TID_紧急更新_20160720
+            //by ldf 07202016 紧急更新一个bug.订单号标准长度调整
+
+            #endregion
+            return string.Empty;
+        }
